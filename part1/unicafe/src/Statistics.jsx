@@ -1,20 +1,20 @@
 import React from "react";
+import StatisticLine from "./StatisticLine";
 
-const Statistics = ({ good, neutral, bad }) => {
+const Statistics = ({ statistics }) => {
+  const { good, neutral, bad, all, average, positive } = statistics;
   if (!good && !neutral && !bad) {
     return <p>No feedback given</p>;
   }
   return (
     <div>
       <h2>statistics</h2>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {good + neutral + bad}</p>
-      <p>
-        average {(good * 1 + neutral * 0 + bad * -1) / (good + neutral + bad)}
-      </p>
-      <p>positive {(good * 100) / (good + neutral + bad)} %</p>
+      <StatisticLine text={"good"} value={good} />
+      <StatisticLine text={"neutral"} value={neutral} />
+      <StatisticLine text={"bad"} value={bad} />
+      <StatisticLine text={"all"} value={all} />
+      <StatisticLine text={"average"} value={average} />
+      <StatisticLine text={"positive"} value={positive} />
     </div>
   );
 };
