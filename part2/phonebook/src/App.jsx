@@ -7,7 +7,15 @@ const App = () => {
     setNewName($event.target.value);
   };
   const handleAdd = () => {
-    setPersons(persons.concat({ name: newName }));
+    const personAlreadyRegistered = persons.find(
+      (person) => person.name === newName
+    );
+    if (!personAlreadyRegistered) {
+      setPersons(persons.concat({ name: newName }));
+    } else {
+      const errorMessage = `${newName} is already added to phonebook`;
+      alert(errorMessage);
+    }
   };
   return (
     <div>
