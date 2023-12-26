@@ -2,7 +2,7 @@ import { useState } from "react";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
-import axios from "axios";
+import personsService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -36,11 +36,9 @@ const App = () => {
     );
     if (!personAlreadyRegistered) {
       const newPhonebook = { name: newName, number: newNumber };
-      axios
-        .post("http://localhost:3001/persons", newPhonebook)
-        .then((response) => {
-          setPersons(persons.concat(response.data));
-        });
+      personsService.create(newPhonebook).then((response) => {
+        setPersons(persons.concat(response.data));
+      });
     } else {
       const errorMessage = `${newName} is already added to phonebook`;
       alert(errorMessage);
