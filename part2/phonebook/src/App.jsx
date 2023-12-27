@@ -3,12 +3,14 @@ import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
 import personsService from "./services/persons";
+import Notification from "./Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [filter, setFilter] = useState("");
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
   useEffect(() => {
     personsService.getAll().then((response) => {
       setPersons(response.data);
@@ -38,6 +40,7 @@ const App = () => {
       const newPhonebook = { name: newName, number: newNumber };
       personsService.create(newPhonebook).then((response) => {
         setPersons(persons.concat(response.data));
+        manageNotification(`Added ${response.data.name}`);
       });
     } else {
       if (
@@ -56,9 +59,16 @@ const App = () => {
               return person;
             })
           );
+          manageNotification(`Number is changed of ${response.data.name}`);
         });
       }
     }
+  };
+  const manageNotification = (message) => {
+    setNotificationMessage(message);
+    setTimeout(() => {
+      setNotificationMessage(null);
+    }, 5000);
   };
   const handleDelete = (id, name) => {
     if (confirm(`Delete ${name}?`)) {
@@ -69,6 +79,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
       <Filter filter={filter} onChange={handleFilter} />
       <h2>add a new</h2>
       <PersonForm
