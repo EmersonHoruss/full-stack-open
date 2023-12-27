@@ -40,12 +40,28 @@ const App = () => {
         setPersons(persons.concat(response.data));
       });
     } else {
-      const errorMessage = `${newName} is already added to phonebook`;
-      alert(errorMessage);
+      if (
+        confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const id = personAlreadyRegistered.id;
+        const person = { id, name: newName, number: newNumber };
+        personsService.update(id, person).then((response) => {
+          setPersons(
+            persons.map((person) => {
+              if (person.id === response.data.id) {
+                return { ...person, number: response.data.number };
+              }
+              return person;
+            })
+          );
+        });
+      }
     }
   };
   const handleDelete = (id, name) => {
-    if (confirm(`Delete ${name}?`) == true) {
+    if (confirm(`Delete ${name}?`)) {
       personsService.remove(id);
       setPersons(persons.filter((person) => person.id !== id));
     }
