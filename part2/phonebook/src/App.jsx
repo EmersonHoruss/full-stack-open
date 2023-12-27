@@ -50,17 +50,26 @@ const App = () => {
       ) {
         const id = personAlreadyRegistered.id;
         const person = { id, name: newName, number: newNumber };
-        personsService.update(id, person).then((response) => {
-          setPersons(
-            persons.map((person) => {
-              if (person.id === response.data.id) {
-                return { ...person, number: response.data.number };
-              }
-              return person;
-            })
-          );
-          manageNotification(`Number is changed of ${response.data.name}`);
-        });
+        personsService
+          .update(id, person)
+          .then((response) => {
+            setPersons(
+              persons.map((person) => {
+                if (person.id === response.data.id) {
+                  return { ...person, number: response.data.number };
+                }
+                return person;
+              })
+            );
+            manageNotification(`Number is changed of ${response.data.name}`);
+          })
+          .catch(() => {
+            const { id, name } = personAlreadyRegistered;
+            manageNotification(
+              `Information of ${name} has already been removed from server`
+            );
+            setPersons(persons.filter((person) => person.id !== id));
+          });
       }
     }
   };
