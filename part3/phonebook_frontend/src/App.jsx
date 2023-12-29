@@ -38,10 +38,15 @@ const App = () => {
     );
     if (!personAlreadyRegistered) {
       const newPhonebook = { name: newName, number: newNumber };
-      personsService.create(newPhonebook).then((response) => {
-        setPersons(persons.concat(response.data));
-        manageNotification(`Added ${response.data.name}`);
-      });
+      personsService
+        .create(newPhonebook)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
+          manageNotification(`Added ${response.data.name}`);
+        })
+        .catch((error) => {
+          manageNotification(error.response.data.error);
+        });
     } else {
       if (
         confirm(
@@ -51,17 +56,9 @@ const App = () => {
         const id = personAlreadyRegistered.id;
         const person = { id, name: newName, number: newNumber };
         personsService
-          .update(id, person)
-          .then((response) => {
-            setPersons(
-              persons.map((person) => {
-                if (person.id === response.data.id) {
-                  return { ...person, number: response.data.number };
-                }
-                return person;
-              })
-            );
-            manageNotification(`Number is changed of ${response.data.name}`);
+          .getOne(id)
+          .then(() => {
+            updatePerson(id, person);
           })
           .catch(() => {
             const { id, name } = personAlreadyRegistered;
@@ -72,6 +69,24 @@ const App = () => {
           });
       }
     }
+  };
+  const updatePerson = (id, person) => {
+    personsService
+      .update(id, person)
+      .then((response) => {
+        setPersons(
+          persons.map((person) => {
+            if (person.id === response.data.id) {
+              return { ...person, number: response.data.number };
+            }
+            return person;
+          })
+        );
+        manageNotification(`Number is changed of ${response.data.name}`);
+      })
+      .catch((error) => {
+        manageNotification(error.response.data.error);
+      });
   };
   const manageNotification = (message) => {
     setNotificationMessage(message);

@@ -5,6 +5,11 @@ const getAll = () => {
     return axios.get(baseUrl)
 }
 
+const getOne = (id) => {
+    const url = `${baseUrl}/${id}`
+    return axios.get(url)
+}
+
 const create = newObject => {
     return axios.post(baseUrl, newObject)
 }
@@ -19,6 +24,7 @@ const remove = (id) => {
 
 export default {
     getAll: getAll,
+    getOne: getOne,
     create: create,
     update: update,
     remove: remove
