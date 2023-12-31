@@ -11,8 +11,10 @@ const mostBlogs = (blogs) => {
   }));
   return _.maxBy(blogsCountFormated, 'blogsCount');
 };
+const mostLikes = (blogs) => _.maxBy(blogs, 'likes');
 module.exports = {
   dummy,
   totalLikes,
   mostBlogs,
+  mostLikes,
 };
