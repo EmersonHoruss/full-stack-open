@@ -26,7 +26,6 @@ describe('Blog API', () => {
     });
     test('blog should has id property and not _id', async () => {
       const response = await api.get('/api/blogs');
-      console.log(response.body[0]);
       expect(response.body[0].id).toBeDefined();
       expect(response.body[0]._id).toBeUndefined();
     });
@@ -69,6 +68,25 @@ describe('Blog API', () => {
 
       const blogs = await helper.blogsInDb();
       expect(blogs.length).toBe(helper.initialBlogs.length);
+    });
+  });
+  describe('delete:', () => {
+    test('if id is correct should response with 204', async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const { id, title } = blogsAtStart[0];
+      await api.delete(`/api/blogs/${id}`).expect(204);
+      const blogsAtEnd = await helper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(--helper.initialBlogs.length);
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(titleBlogs).not.toContain(title);
+    });
+    test('when id is incorrect should response with 204', async () => {
+      const wrongId = await helper.nonExistingId();
+      await api.delete(`/api/blogs/${wrongId}`).expect(204);
+      const blogsAtEnd = await helper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+      const idBlogs = blogsAtEnd.map((blog) => blog.id);
+      expect(idBlogs).not.toContain(wrongId);
     });
   });
 });

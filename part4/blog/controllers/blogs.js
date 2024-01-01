@@ -13,4 +13,14 @@ router.post('/', async (request, response) => {
   logger.info('saved blog in db', savedBlog);
   response.status(201).json(savedBlog);
 });
+router.delete('/:id', async (request, response) => {
+  const { id } = request.params;
+  try {
+    await Blog.findByIdAndDelete(id);
+    response.status(204).end();
+    
+  } catch (error) {
+    console.log(error)
+  }
+});
 module.exports = router;

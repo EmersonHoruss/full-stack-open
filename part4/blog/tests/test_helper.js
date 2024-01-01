@@ -33,7 +33,7 @@ const aBlog = {
   likes: 30,
 };
 const nonExistingId = async () => {
-  const blog = new Blog({});
+  const blog = new Blog(aBlog);
   await blog.save();
   await blog.deleteOne();
   return blog._id.toString();
