@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
+const _ = require('lodash');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/Blog');
 const helper = require('./test_helper');
-const logger = require('../utils/logger');
 
 const api = supertest(app);
 beforeEach(async () => {
@@ -41,6 +41,20 @@ describe('Blog API', () => {
       const titleBlogs = (await helper.blogsInDb()).map((blog) => blog.title);
       expect(titleBlogs).toHaveLength(++helper.initialBlogs.length);
       expect(titleBlogs).toContain(response.body.title);
+    });
+    test('if likes is missing should be 0 automatically', async () => {
+      const blogToSave = _.clone(helper.aBlog);
+      delete blogToSave.likes;
+      expect(blogToSave.likes).toBeUndefined();
+      const response = await api
+        .post('/api/blogs')
+        .send()
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
+      const titleBlogs = (await helper.blogsInDb()).map((blog) => blog.title);
+      expect(titleBlogs).toHaveLength(++helper.initialBlogs.length);
+      expect(titleBlogs).toContain(response.body.title);
+      expect(response.body.likes).toBe(0);
     });
   });
 });
