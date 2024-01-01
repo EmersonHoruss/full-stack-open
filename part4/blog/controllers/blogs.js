@@ -5,11 +5,9 @@ router.get('/', async (_, response) => {
   const blogs = await Blog.find({});
   response.json(blogs);
 });
-router.post('/', (request, response) => {
+router.post('/', async (request, response) => {
   const blog = new Blog(request.body);
-
-  blog.save().then((result) => {
-    response.status(201).json(result);
-  });
+  const savedBlog = await blog.save();
+  response.status(201).json(savedBlog);
 });
 module.exports = router;
