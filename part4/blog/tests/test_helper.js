@@ -26,6 +26,12 @@ const initialBlogs = [
     likes: 3,
   },
 ];
+const aBlog = {
+  title: 'Ask for the Word',
+  author: 'García Perez, Alan',
+  url: 'https://www.crisol.com.pe/libro-pida-palabra-9786123195304',
+  likes: 30,
+};
 const nonExistingId = async () => {
   const blog = new Blog({});
   await blog.save();
@@ -38,6 +44,7 @@ const blogsInDb = async () => {
 };
 module.exports = {
   initialBlogs,
+  aBlog,
   nonExistingId,
   blogsInDb,
 };
