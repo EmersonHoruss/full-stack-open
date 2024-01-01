@@ -3,6 +3,7 @@ const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/Blog');
 const helper = require('./test_helper');
+const logger = require('../utils/logger');
 
 const api = supertest(app);
 beforeEach(async () => {
@@ -11,16 +12,22 @@ beforeEach(async () => {
   const promiseArray = blogObjects.map((blog) => blog.save());
   await Promise.all(promiseArray);
 });
-describe('API: get blogs', () => {
-  test('returned as json uw123', async () => {
+describe('API: get all blogs:', () => {
+  test('response should be json', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/);
   });
-  test('length is correct', async () => {
+  test('length should be correct', async () => {
     const response = await api.get('/api/blogs');
     expect(response.body).toHaveLength(helper.initialBlogs.length);
+  });
+  test('blog should has id property and not _id', async () => {
+    const response = await api.get('/api/blogs');
+    console.log(response.body[0]);
+    expect(response.body[0].id).toBeDefined();
+    expect(response.body[0]._id).toBeUndefined();
   });
 });
 afterAll(async () => {
