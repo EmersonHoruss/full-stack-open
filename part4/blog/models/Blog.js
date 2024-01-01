@@ -7,9 +7,11 @@ const blogSchema = new mongoose.Schema({
   },
   author: {
     type: String,
-    required: [true, 'author is required'],
   },
-  url: String,
+  url: {
+    type: String,
+    required: [true, 'url is required'],
+  },
   likes: {
     type: Number,
     default: 0,

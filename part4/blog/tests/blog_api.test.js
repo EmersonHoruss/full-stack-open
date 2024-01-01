@@ -56,16 +56,16 @@ describe('Blog API', () => {
       expect(titleBlogs).toContain(response.body.title);
       expect(response.body.likes).toBe(0);
     });
-    test('if title or author are missing should not save', async () => {
-      const blogWithoutTitle = _.clone(helper.aBlog);
-      delete blogWithoutTitle.title;
-      expect(blogWithoutTitle.title).toBeUndefined();
-      await api.post('/api/blogs').send(blogWithoutTitle).expect(400);
+    test('if title or url are missing should not save', async () => {
+      let blog = _.clone(helper.aBlog);
+      delete blog.title;
+      expect(blog.title).toBeUndefined();
+      await api.post('/api/blogs').send(blog).expect(400);
 
-      const blogWithoutAuthor = _.clone(helper.aBlog);
-      delete blogWithoutAuthor.author;
-      expect(blogWithoutAuthor.author).toBeUndefined();
-      await api.post('/api/blogs').send(blogWithoutAuthor).expect(400);
+      blog = _.clone(helper.aBlog);
+      delete blog.url;
+      expect(blog.url).toBeUndefined();
+      await api.post('/api/blogs').send(blog).expect(400);
 
       const blogs = await helper.blogsInDb();
       expect(blogs.length).toBe(helper.initialBlogs.length);
