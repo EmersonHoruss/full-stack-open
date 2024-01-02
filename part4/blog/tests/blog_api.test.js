@@ -4,6 +4,7 @@ const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/Blog');
 const helper = require('./blogs_helper');
+const paths = require('../constants/paths');
 
 const api = supertest(app);
 beforeEach(async () => {
@@ -16,16 +17,16 @@ describe('Blog API', () => {
   describe('get all blogs:', () => {
     test('response should be json', async () => {
       await api
-        .get('/api/blogs')
+        .get(paths.blogs)
         .expect(200)
         .expect('Content-Type', /application\/json/);
     });
     test('length should be correct', async () => {
-      const response = await api.get('/api/blogs');
+      const response = await api.get(paths.blogs);
       expect(response.body).toHaveLength(helper.initialBlogs.length);
     });
     test('blog should has id property and not _id', async () => {
-      const response = await api.get('/api/blogs');
+      const response = await api.get(paths.blogs);
       expect(response.body[0].id).toBeDefined();
       expect(response.body[0]._id).toBeUndefined();
     });
@@ -33,7 +34,7 @@ describe('Blog API', () => {
   describe('save a blog:', () => {
     test('valid blog should be added correctly', async () => {
       const response = await api
-        .post('/api/blogs')
+        .post(paths.blogs)
         .send(helper.aBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -46,7 +47,7 @@ describe('Blog API', () => {
       delete blog.likes;
       expect(blog.likes).toBeUndefined();
       const responseOfSave = await api
-        .post('/api/blogs')
+        .post(paths.blogs)
         .send(blog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -61,12 +62,12 @@ describe('Blog API', () => {
       let blog = _.clone(helper.aBlog);
       delete blog.title;
       expect(blog.title).toBeUndefined();
-      await api.post('/api/blogs').send(blog).expect(400);
+      await api.post(paths.blogs).send(blog).expect(400);
 
       blog = _.clone(helper.aBlog);
       delete blog.url;
       expect(blog.url).toBeUndefined();
-      await api.post('/api/blogs').send(blog).expect(400);
+      await api.post(paths.blogs).send(blog).expect(400);
 
       const blogs = await helper.blogsInDb();
       expect(blogs).toHaveLength(helper.initialBlogs.length);
@@ -94,7 +95,6 @@ describe('Blog API', () => {
   describe('update a blog:', () => {
     test('valid blog should be added correctly', async () => {
       const aBlog = await helper.aBlogInDb();
-      console.log(await helper.aBlogInDb());
       const { id } = aBlog;
       delete aBlog.id;
       aBlog.likes = 100;
