@@ -3,7 +3,7 @@ const _ = require('lodash');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/Blog');
-const helper = require('./test_helper');
+const helper = require('./blogs_helper');
 
 const api = supertest(app);
 beforeEach(async () => {
