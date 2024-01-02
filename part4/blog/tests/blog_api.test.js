@@ -30,7 +30,7 @@ describe('Blog API', () => {
       expect(response.body[0]._id).toBeUndefined();
     });
   });
-  describe('save blog:', () => {
+  describe('save a blog:', () => {
     test('valid blog should be added correctly', async () => {
       const response = await api
         .post('/api/blogs')
@@ -72,7 +72,7 @@ describe('Blog API', () => {
       expect(blogs).toHaveLength(helper.initialBlogs.length);
     });
   });
-  describe('delete blog:', () => {
+  describe('delete a blog:', () => {
     test('if id is correct should response with 204', async () => {
       const blogsAtStart = await helper.blogsInDb();
       const { id, title } = blogsAtStart[0];
@@ -89,6 +89,46 @@ describe('Blog API', () => {
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
       const idBlogs = blogsAtEnd.map((blog) => blog.id);
       expect(idBlogs).not.toContain(wrongId);
+    });
+  });
+  describe('update a blog:', () => {
+    test('valid blog should be added correctly', async () => {
+      const aBlog = await helper.aBlogInDb();
+      console.log(await helper.aBlogInDb());
+      const { id } = aBlog;
+      delete aBlog.id;
+      aBlog.likes = 100;
+      const response = await api
+        .put(`/api/blogs/${id}`)
+        .send(aBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+      const likeBlogs = (await helper.blogsInDb()).map((blog) => blog.likes);
+      expect(likeBlogs).toHaveLength(helper.initialBlogs.length);
+      expect(likeBlogs).toContain(response.body.likes);
+    });
+    test('if title or url are missing should not update', async () => {
+      let aBlog = await helper.aBlogInDb();
+      const { id } = aBlog;
+      delete aBlog.id;
+      aBlog.title = null;
+      await api
+        .put(`/api/blogs/${id}`)
+        .send(aBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      const noUpdateBlog = await helper.aBlogInDb();
+      expect(noUpdateBlog.title).toBe(helper.mythBlog.title);
+
+      aBlog = await helper.aBlogInDb();
+      delete aBlog.id;
+      aBlog.url = null;
+      await api
+        .put(`/api/blogs/${id}`)
+        .send(aBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(noUpdateBlog.url).toBe(helper.mythBlog.url);
     });
   });
 });

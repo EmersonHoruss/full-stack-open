@@ -15,12 +15,17 @@ router.post('/', async (request, response) => {
 });
 router.delete('/:id', async (request, response) => {
   const { id } = request.params;
-  try {
-    await Blog.findByIdAndDelete(id);
-    response.status(204).end();
-    
-  } catch (error) {
-    console.log(error)
-  }
+  await Blog.findByIdAndDelete(id);
+  response.status(204).end();
+});
+router.put('/:id', async (request, response) => {
+  const { id } = request.params;
+  const blog = request.body;
+  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  });
+  response.status(200).json(updatedBlog);
 });
 module.exports = router;
