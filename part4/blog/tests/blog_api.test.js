@@ -13,7 +13,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray);
 });
 describe('Blog API', () => {
-  describe('get all:', () => {
+  describe('get all blogs:', () => {
     test('response should be json', async () => {
       await api
         .get('/api/blogs')
@@ -30,7 +30,7 @@ describe('Blog API', () => {
       expect(response.body[0]._id).toBeUndefined();
     });
   });
-  describe('save:', () => {
+  describe('save blog:', () => {
     test('valid blog should be added correctly', async () => {
       const response = await api
         .post('/api/blogs')
@@ -38,22 +38,24 @@ describe('Blog API', () => {
         .expect(201)
         .expect('Content-Type', /application\/json/);
       const titleBlogs = (await helper.blogsInDb()).map((blog) => blog.title);
-      expect(titleBlogs).toHaveLength(++helper.initialBlogs.length);
+      expect(titleBlogs).toHaveLength(helper.initialBlogs.length + 1);
       expect(titleBlogs).toContain(response.body.title);
     });
     test('if likes is missing should be 0 automatically', async () => {
-      const blogToSave = _.clone(helper.aBlog);
-      delete blogToSave.likes;
-      expect(blogToSave.likes).toBeUndefined();
-      const response = await api
+      const blog = _.clone(helper.aBlog);
+      delete blog.likes;
+      expect(blog.likes).toBeUndefined();
+      const responseOfSave = await api
         .post('/api/blogs')
-        .send()
+        .send(blog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
-      const titleBlogs = (await helper.blogsInDb()).map((blog) => blog.title);
-      expect(titleBlogs).toHaveLength(++helper.initialBlogs.length);
-      expect(titleBlogs).toContain(response.body.title);
-      expect(response.body.likes).toBe(0);
+      const blogsAtEnd = await helper.blogsInDb();
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
+      const { title, likes } = responseOfSave.body;
+      expect(titleBlogs).toContain(title);
+      expect(likes).toBe(0);
     });
     test('if title or url are missing should not save', async () => {
       let blog = _.clone(helper.aBlog);
@@ -67,16 +69,16 @@ describe('Blog API', () => {
       await api.post('/api/blogs').send(blog).expect(400);
 
       const blogs = await helper.blogsInDb();
-      expect(blogs.length).toBe(helper.initialBlogs.length);
+      expect(blogs).toHaveLength(helper.initialBlogs.length);
     });
   });
-  describe('delete:', () => {
+  describe('delete blog:', () => {
     test('if id is correct should response with 204', async () => {
       const blogsAtStart = await helper.blogsInDb();
       const { id, title } = blogsAtStart[0];
       await api.delete(`/api/blogs/${id}`).expect(204);
       const blogsAtEnd = await helper.blogsInDb();
-      expect(blogsAtEnd).toHaveLength(--helper.initialBlogs.length);
+      expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
       expect(titleBlogs).not.toContain(title);
     });
