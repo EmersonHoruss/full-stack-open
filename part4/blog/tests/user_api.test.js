@@ -3,6 +3,7 @@ const _ = require('lodash');
 const supertest = require('supertest');
 const app = require('../app');
 const User = require('../models/User');
+const validationMessages = require('../models/userValidationMessages');
 const helper = require('./users_helper');
 const paths = require('../constants/paths');
 
@@ -44,6 +45,65 @@ describe('User API', () => {
       const nameUsers = (await helper.usersInDb()).map((user) => user.name);
       expect(nameUsers).toHaveLength(helper.initialUsers.length + 1);
       expect(nameUsers).toContain(response.body.name);
+    });
+    test('user with already username should not save', async () => {
+      const alanUser = _.clone(helper.alanUser);
+      const response = await api
+        .post(paths.users)
+        .send(alanUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(validationMessages.username.unique);
+      const users = await helper.usersInDb();
+      expect(users).toHaveLength(helper.initialUsers.length);
+    });
+    test('user without username should not save', async () => {
+      let unsavedUser = _.clone(helper.unsavedUser);
+      delete unsavedUser.username;
+      const response = await api
+        .post(paths.users)
+        .send(unsavedUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(validationMessages.username.required);
+      const users = await helper.usersInDb();
+      expect(users).toHaveLength(helper.initialUsers.length);
+    });
+    test('user with wrong username size should not save', async () => {
+      let unsavedUser = _.clone(helper.unsavedUser);
+      unsavedUser.username = '12';
+      const response = await api
+        .post(paths.users)
+        .send(unsavedUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(validationMessages.username.minLength);
+      const users = await helper.usersInDb();
+      expect(users).toHaveLength(helper.initialUsers.length);
+    });
+    test('user without password should not save', async () => {
+      let unsavedUser = _.clone(helper.unsavedUser);
+      delete unsavedUser.password;
+      const response = await api
+        .post(paths.users)
+        .send(unsavedUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(validationMessages.password.required);
+      const users = await helper.usersInDb();
+      expect(users).toHaveLength(helper.initialUsers.length);
+    });
+    test('user with wrong password size should not save', async () => {
+      let unsavedUser = _.clone(helper.unsavedUser);
+      unsavedUser.password = '12';
+      const response = await api
+        .post(paths.users)
+        .send(unsavedUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(validationMessages.password.minLength);
+      const users = await helper.usersInDb();
+      expect(users).toHaveLength(helper.initialUsers.length);
     });
   });
 });
