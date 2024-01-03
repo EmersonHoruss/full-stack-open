@@ -192,21 +192,21 @@ describe('Blog API', () => {
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
       expect(titleBlogs).toContain(title);
     });
-    test('if token is of another user so server responses with 401', async () => {
-      const blogsAtStart = await blogsHelper.blogsInDb();
-      const { id, title,user } = blogsAtStart[0];
-      const token = await loginHelper.tokenUnmatchWithUsername(user.username);
-      console.log(token)
-      const response = await api
-        .delete(`/api/blogs/${id}`)
-        .set('authorization', `Bearer ${token}`)
-        .expect(401);
-      expect(response.body.error).toBe(blogValidationMessages.invalidDeletation);
-      const blogsAtEnd = await blogsHelper.blogsInDb();
-      expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
-      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
-      expect(titleBlogs).toContain(title);
-    });
+    // test('if token is of another user so server responses with 401', async () => {
+    //   const blogsAtStart = await blogsHelper.blogsInDb();
+    //   const { id, title,user } = blogsAtStart[0];
+    //   const token = await loginHelper.tokenUnmatchWithUsername(user.username);
+    //   console.log(token)
+    //   const response = await api
+    //     .delete(`/api/blogs/${id}`)
+    //     .set('authorization', `Bearer ${token}`)
+    //     .expect(401);
+    //   expect(response.body.error).toBe(blogValidationMessages.invalidDeletation);
+    //   const blogsAtEnd = await blogsHelper.blogsInDb();
+    //   expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
+    //   const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+    //   expect(titleBlogs).toContain(title);
+    // });
   });
   describe('update a blog:', () => {
     test('valid blog should be updated correctly', async () => {

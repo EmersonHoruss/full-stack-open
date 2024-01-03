@@ -11,11 +11,7 @@ router.get('/', async (_, response) => {
   response.json(blogs);
 });
 router.post('/', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: loginValidationMessages.invalidToken });
-  }
-  const user = await User.findById(decodedToken.id);
+  const user = request.user;
 
   const blog = new Blog({ ...request.body, userId: user.id });
   logger.info('blog request body: ', blog);
@@ -34,11 +30,10 @@ router.delete('/:id', async (request, response) => {
   if (!blog) {
     response.status(204).end();
   }
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: loginValidationMessages.invalidToken });
+  if (!request.token) {
+    response.status(401).json({ error: loginValidationMessages.forgottenToken });
   }
-  if (decodedToken.id.toString() !== blog.userId.toString()) {
+  if (request.user.id.toString() !== blog.userId.toString()) {
     return response.status(401).json({ error: blogValidationMessages.invalidDeletation });
   }
   await Blog.findByIdAndDelete(id);

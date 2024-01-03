@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const loginValidationMessages = require('../models/loginValidationMessages');
 const logger = require('./logger');
 
@@ -40,10 +42,21 @@ const tokenExtractor = (request, _, next) => {
   request.token = token;
   next();
 };
+const userExtractor = async (request, response, next) => {
+  if (request.token) {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if (!decodedToken.id) {
+      response.status(401).json({ error: loginValidationMessages.invalidToken });
+    }
+    request.user = await User.findById(decodedToken.id);
+  }
+  next();
+};
 const middlewares = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
   tokenExtractor,
+  userExtractor,
 };
 module.exports = middlewares;
