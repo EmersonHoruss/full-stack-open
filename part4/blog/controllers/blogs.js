@@ -11,6 +11,10 @@ router.get('/', async (_, response) => {
   response.json(blogs);
 });
 router.post('/', async (request, response) => {
+  if (!request.token) {
+    response.status(401).json({ error: loginValidationMessages.forgottenToken });
+  }
+
   const user = request.user;
 
   const blog = new Blog({ ...request.body, userId: user.id });

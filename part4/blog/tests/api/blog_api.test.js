@@ -64,7 +64,7 @@ describe('Blog API', () => {
     });
   });
   describe('save a blog:', () => {
-    test('valid blog should be added correctly', async () => {
+    test('when saving a valid blog should be added correctly', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
       const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
@@ -85,7 +85,7 @@ describe('Blog API', () => {
       const userTitleBlogs = updatedUser.blogs.map((blog) => blog.title);
       expect(userTitleBlogs).toContain(title);
     });
-    test('blog without likes should be saved and likes should be automatically set to 0', async () => {
+    test('when saving a blog without likes should be saved and likes should be automatically set to 0', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
       const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
@@ -108,7 +108,7 @@ describe('Blog API', () => {
       const userTitleBlogs = updatedUser.blogs.map((blog) => blog.title);
       expect(userTitleBlogs).toContain(title);
     });
-    test('blog without title should not save', async () => {
+    test('when saving a blog without title should not save', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
       const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
@@ -128,7 +128,7 @@ describe('Blog API', () => {
       const updatedUser = await usersHelper.aUserInDb(user.username);
       expect(updatedUser.blogs).toHaveLength(user.blogs.length);
     });
-    test('blog without url should not save', async () => {
+    test('when saving a blog without url should not save', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
       const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
@@ -148,9 +148,25 @@ describe('Blog API', () => {
       const updatedUser = await usersHelper.aUserInDb(user.username);
       expect(updatedUser.blogs).toHaveLength(user.blogs.length);
     });
+    test('when saving blog if token is fogotten so server responses with 401', async () => {
+      const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
+      const blogToSave = _.clone(blogsHelper.unsavedBlog);
+      blogToSave.userId = user.id;
+      const response = await api
+        .post(paths.blogs)
+        .send(blogToSave)
+        .expect(401)
+        .expect('Content-Type', /application\/json/);
+      expect(response.body.error).toBe(loginValidationMessages.forgottenToken);
+      const blogs = await blogsHelper.blogsInDb();
+      expect(blogs).toHaveLength(blogsHelper.initialBlogs.length);
+
+      const updatedUser = await usersHelper.aUserInDb(user.username);
+      expect(updatedUser.blogs).toHaveLength(user.blogs.length);
+    });
   });
   describe('delete a blog:', () => {
-    test('if id is correct should response with 204', async () => {
+    test('when deleting a blog if id is correct should response with 204', async () => {
       const blogsAtStart = await blogsHelper.blogsInDb();
       const { id, title, user } = blogsAtStart[0];
       const token = await loginHelper.validToken(user.username);
@@ -160,7 +176,7 @@ describe('Blog API', () => {
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
       expect(titleBlogs).not.toContain(title);
     });
-    test('when id is incorrect should response with 204', async () => {
+    test('when deleting a blog if id is incorrect should response with 204', async () => {
       const wrongId = await blogsHelper.nonExistingId();
       await api.delete(`/api/blogs/${wrongId}`).expect(204);
       const blogsAtEnd = await blogsHelper.blogsInDb();
@@ -168,7 +184,7 @@ describe('Blog API', () => {
       const idBlogs = blogsAtEnd.map((blog) => blog.id);
       expect(idBlogs).not.toContain(wrongId);
     });
-    test('if token is forgotten so server responses with 401', async () => {
+    test('when deleting a blog if token is forgotten so server responses with 401', async () => {
       const blogsAtStart = await blogsHelper.blogsInDb();
       const { id, title } = blogsAtStart[0];
       const response = await api.delete(`/api/blogs/${id}`).expect(401);
@@ -178,7 +194,7 @@ describe('Blog API', () => {
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
       expect(titleBlogs).toContain(title);
     });
-    test('if token is malformed so server responses with 401', async () => {
+    test('when deleting a blog if token is malformed so server responses with 401', async () => {
       const blogsAtStart = await blogsHelper.blogsInDb();
       const { id, title } = blogsAtStart[0];
       const token = loginHelper.malformedToken;
@@ -192,21 +208,20 @@ describe('Blog API', () => {
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
       expect(titleBlogs).toContain(title);
     });
-    // test('if token is of another user so server responses with 401', async () => {
-    //   const blogsAtStart = await blogsHelper.blogsInDb();
-    //   const { id, title,user } = blogsAtStart[0];
-    //   const token = await loginHelper.tokenUnmatchWithUsername(user.username);
-    //   console.log(token)
-    //   const response = await api
-    //     .delete(`/api/blogs/${id}`)
-    //     .set('authorization', `Bearer ${token}`)
-    //     .expect(401);
-    //   expect(response.body.error).toBe(blogValidationMessages.invalidDeletation);
-    //   const blogsAtEnd = await blogsHelper.blogsInDb();
-    //   expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
-    //   const titleBlogs = blogsAtEnd.map((blog) => blog.title);
-    //   expect(titleBlogs).toContain(title);
-    // });
+    test('when deleting a blog if token is of another user so server responses with 401', async () => {
+      const blogsAtStart = await blogsHelper.blogsInDb();
+      const { id, title, user } = blogsAtStart[0];
+      const token = await loginHelper.tokenOfAnotherUser(user.username);
+      const response = await api
+        .delete(`/api/blogs/${id}`)
+        .set('authorization', `Bearer ${token}`)
+        .expect(401);
+      expect(response.body.error).toBe(blogValidationMessages.invalidDeletation);
+      const blogsAtEnd = await blogsHelper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(titleBlogs).toContain(title);
+    });
   });
   describe('update a blog:', () => {
     test('valid blog should be updated correctly', async () => {
