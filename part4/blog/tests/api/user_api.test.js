@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const _ = require('lodash');
 const supertest = require('supertest');
-const app = require('../app');
-const User = require('../models/User');
-const validationMessages = require('../models/userValidationMessages');
+const app = require('../../app');
+const User = require('../../models/User');
+const validationMessages = require('../../models/userValidationMessages');
 const helper = require('./users_helper');
-const paths = require('../constants/paths');
+const paths = require('../../constants/paths');
 
 const api = supertest(app);
 beforeEach(async () => {

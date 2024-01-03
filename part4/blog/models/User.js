@@ -11,6 +11,12 @@ const userSchema = new mongoose.Schema({
   },
   name: { type: String },
   password: { type: String },
+  blogIds: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog',
+    },
+  ],
 });
 userSchema.set('toJSON', {
   transform: (_, returnedObject) => {
@@ -18,6 +24,8 @@ userSchema.set('toJSON', {
     delete returnedObject._id;
     delete returnedObject.__v;
     delete returnedObject.password;
+    returnedObject.blogs = returnedObject.blogIds;
+    delete returnedObject.blogIds;
   },
 });
 userSchema.plugin(uniqueValidator);

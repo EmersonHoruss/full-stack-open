@@ -5,7 +5,7 @@ const crypt = require('../constants/crypt');
 const bcrypt = require('bcryptjs');
 
 router.get('/', async (_, response) => {
-  const users = await User.find({});
+  const users = await User.find({}).populate('blogIds');
   response.json(users);
 });
 router.post('/', async (request, response) => {

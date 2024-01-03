@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../../models/User');
 
 const albertUser = {
   username: 'albert',
@@ -23,20 +23,19 @@ const nonExistingId = async () => {
   return user._id.toString();
 };
 const usersInDb = async () => {
-  const users = await User.find({});
+  const users = await User.find({}).populate('blogIds');
   return users.map((user) => user.toJSON());
 };
-const aUserInDb = async () => {
-  const users = await User.find({ title: alanUser.title });
+const aUserInDb = async (username) => {
+  const users = await User.find({ username }).populate('blogIds');
   return users.map((user) => user.toJSON())[0];
 };
 module.exports = {
+  alanUser,
+  albertUser,
   initialUsers,
-  aUser: unsavedUser,
+  unsavedUser,
   nonExistingId,
   usersInDb,
   aUserInDb,
-  alanUser,
-  albertUser,
-  unsavedUser,
 };

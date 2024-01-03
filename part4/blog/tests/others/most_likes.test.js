@@ -1,6 +1,6 @@
-const listHelper = require('../utils/list_helper');
+const listHelper = require('../../utils/list_helper');
 
-describe('most blogs', () => {
+describe('most likes', () => {
   const listWithManyBlogs = [
     {
       _id: '5a422aa71b54a676234d17f8',
@@ -11,13 +11,13 @@ describe('most blogs', () => {
       __v: 0,
     },
     {
-        _id: '5a422aa71b54a676234d17f8',
-        title: 'Go To Statement Considered Harmful 2',
-        author: 'Edsger W. Dijkstra',
-        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-        likes: 5,
-        __v: 0,
-      },
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful 2',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 51,
+      __v: 0,
+    },
     {
       _id: '5a422aa71b54a676234d17f8',
       title: 'Chavín',
@@ -36,8 +36,8 @@ describe('most blogs', () => {
     },
   ];
   test('of a bigger list is calculated right', () => {
-    const { author, blogsCount } = listHelper.mostBlogs(listWithManyBlogs);
+    const { author, likes } = listHelper.mostLikes(listWithManyBlogs);
     expect(author).toBe('Edsger W. Dijkstra');
-    expect(blogsCount).toBe(2);
+    expect(likes).toBe(51);
   });
 });
