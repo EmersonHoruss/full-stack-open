@@ -30,6 +30,31 @@ describe('Login API', () => {
       .expect('Content-Type', /application\/json/);
     expect(loginResponse.body.error).toBe(validationMessages.invalidUsernameOrPassword);
   });
+  test('if token is malformed so server responses 401', async () => {
+    const token = helper.malformedToken;
+    const response = await api
+      .post(`${paths.login}/malformedToken`)
+      .set('authorization', `Bearer ${token}`)
+      .expect(401);
+    expect(response.body.error).toBe(validationMessages.malformedToken);
+  });
+  test('if token and username does not match so server responses 400', async () => {
+    const token = await helper.tokenUnmatchWithUsername(helper.loginUser.username);
+    const response = await api
+      .post(`${paths.login}/tokenMatchWithUsername`)
+      .set('authorization', `Bearer ${token}`)
+      .send(helper.loginUser)
+      .expect(400);
+    expect(response.body.error).toBe(validationMessages.tokenUnmatchWithUsername);
+  });
+  test('if token and username match so server responses 200', async () => {
+    const token = await helper.validToken(helper.loginUser.username);
+    await api
+      .post(`${paths.login}/tokenMatchWithUsername`)
+      .set('authorization', `Bearer ${token}`)
+      .send(helper.loginUser)
+      .expect(200);
+  });
 });
 afterEach(async () => {
   await User.deleteMany({});

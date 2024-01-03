@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Blog = require('../models/Blog');
 const User = require('../models/User');
+const blogValidationMessages = require('../models/blogValidationMessages');
 const loginValidationMessages = require('../models/loginValidationMessages');
 const logger = require('../utils/logger');
 const jwt = require('jsonwebtoken');
@@ -9,7 +10,6 @@ router.get('/', async (_, response) => {
   const blogs = await Blog.find({}).populate('userId');
   response.json(blogs);
 });
-
 router.post('/', async (request, response) => {
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if (!decodedToken.id) {
@@ -30,6 +30,17 @@ router.post('/', async (request, response) => {
 });
 router.delete('/:id', async (request, response) => {
   const { id } = request.params;
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    response.status(204).end();
+  }
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: loginValidationMessages.invalidToken });
+  }
+  if (decodedToken.id.toString() !== blog.userId.toString()) {
+    return response.status(401).json({ error: blogValidationMessages.invalidDeletation });
+  }
   await Blog.findByIdAndDelete(id);
   response.status(204).end();
 });

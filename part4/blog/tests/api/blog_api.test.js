@@ -6,8 +6,11 @@ const Blog = require('../../models/Blog');
 const User = require('../../models/User');
 const blogsHelper = require('./blogs_helper');
 const usersHelper = require('./users_helper');
+const loginHelper = require('./login_helper');
 const paths = require('../../constants/paths');
 const validationMessages = require('../../models/blogValidationMessages');
+const blogValidationMessages = require('../../models/blogValidationMessages');
+const loginValidationMessages = require('../../models/loginValidationMessages');
 
 const api = supertest(app);
 beforeEach(async () => {
@@ -149,8 +152,9 @@ describe('Blog API', () => {
   describe('delete a blog:', () => {
     test('if id is correct should response with 204', async () => {
       const blogsAtStart = await blogsHelper.blogsInDb();
-      const { id, title } = blogsAtStart[0];
-      await api.delete(`/api/blogs/${id}`).expect(204);
+      const { id, title, user } = blogsAtStart[0];
+      const token = await loginHelper.validToken(user.username);
+      await api.delete(`/api/blogs/${id}`).set('authorization', `Bearer ${token}`).expect(204);
       const blogsAtEnd = await blogsHelper.blogsInDb();
       expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length - 1);
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);
@@ -163,6 +167,45 @@ describe('Blog API', () => {
       expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
       const idBlogs = blogsAtEnd.map((blog) => blog.id);
       expect(idBlogs).not.toContain(wrongId);
+    });
+    test('if token is forgotten so server responses with 401', async () => {
+      const blogsAtStart = await blogsHelper.blogsInDb();
+      const { id, title } = blogsAtStart[0];
+      const response = await api.delete(`/api/blogs/${id}`).expect(401);
+      expect(response.body.error).toBe(loginValidationMessages.forgottenToken);
+      const blogsAtEnd = await blogsHelper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(titleBlogs).toContain(title);
+    });
+    test('if token is malformed so server responses with 401', async () => {
+      const blogsAtStart = await blogsHelper.blogsInDb();
+      const { id, title } = blogsAtStart[0];
+      const token = loginHelper.malformedToken;
+      const response = await api
+        .delete(`/api/blogs/${id}`)
+        .set('authorization', `Bearer ${token}`)
+        .expect(401);
+      expect(response.body.error).toBe(loginValidationMessages.malformedToken);
+      const blogsAtEnd = await blogsHelper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(titleBlogs).toContain(title);
+    });
+    test('if token is of another user so server responses with 401', async () => {
+      const blogsAtStart = await blogsHelper.blogsInDb();
+      const { id, title,user } = blogsAtStart[0];
+      const token = await loginHelper.tokenUnmatchWithUsername(user.username);
+      console.log(token)
+      const response = await api
+        .delete(`/api/blogs/${id}`)
+        .set('authorization', `Bearer ${token}`)
+        .expect(401);
+      expect(response.body.error).toBe(blogValidationMessages.invalidDeletation);
+      const blogsAtEnd = await blogsHelper.blogsInDb();
+      expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length);
+      const titleBlogs = blogsAtEnd.map((blog) => blog.title);
+      expect(titleBlogs).toContain(title);
     });
   });
   describe('update a blog:', () => {

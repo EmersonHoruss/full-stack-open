@@ -1,3 +1,4 @@
+const loginValidationMessages = require('../models/loginValidationMessages');
 const logger = require('./logger');
 
 const requestLogger = (request, _, next) => {
@@ -21,6 +22,12 @@ const errorHandler = (error, _, response, next) => {
     );
     const errorMessage = errorMessages[0].split(': ')[1];
     return response.status(400).json({ error: errorMessage });
+  }
+  if (error.name === 'JsonWebTokenError' && error.message === 'jwt malformed') {
+    return response.status(401).json({ error: loginValidationMessages.malformedToken });
+  }
+  if (error.name === 'JsonWebTokenError' && error.message === 'jwt must be provided') {
+    return response.status(401).json({ error: loginValidationMessages.forgottenToken });
   }
   next(error);
 };

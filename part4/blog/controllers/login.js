@@ -20,5 +20,15 @@ loginRouter.post('/', async (request, response) => {
   const token = jwt.sign(userForToken, process.env.SECRET);
   response.status(200).send({ token, username, name: user.name });
 });
+loginRouter.post('/malformedToken', async (request, response) => {
+  jwt.verify(request.token, process.env.SECRET);
+});
+loginRouter.post('/tokenMatchWithUsername', async (request, response) => {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (decodedToken.username !== request.body.username) {
+    response.status(400).send({ error: validationMessages.tokenUnmatchWithUsername });
+  }
+  response.status(200).end();
+});
 
 module.exports = loginRouter;

@@ -30,6 +30,7 @@ const aUserInDb = async (username) => {
   const users = await User.find({ username }).populate('blogIds');
   return users.map((user) => user.toJSON())[0];
 };
+const getPassword = (username) => initialUsers.find((user) => user.username === username).password;
 module.exports = {
   alanUser,
   albertUser,
@@ -38,4 +39,5 @@ module.exports = {
   nonExistingId,
   usersInDb,
   aUserInDb,
+  getPassword,
 };
