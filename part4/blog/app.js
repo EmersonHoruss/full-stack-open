@@ -7,6 +7,7 @@ const logger = require('./utils/logger');
 const middleware = require('./utils/middlewares');
 const blogsRouter = require('./controllers/blogs');
 const usersRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login');
 const paths = require('./constants/paths');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(middleware.requestLogger);
 app.use(paths.blogs, blogsRouter);
 app.use(paths.users, usersRouter);
+app.use(paths.login, loginRouter);
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 module.exports = app;
