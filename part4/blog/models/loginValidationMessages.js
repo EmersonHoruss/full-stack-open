@@ -1,4 +1,5 @@
 const loginValidationMessages = {
-  error: 'invalid username or password',
+  invalidUsernameOrPassword: 'invalid username or password',
+  invalidToken: 'invalid token',
 };
 module.exports = loginValidationMessages;

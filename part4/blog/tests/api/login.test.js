@@ -28,7 +28,7 @@ describe('Login API', () => {
       .send(helper.wrongLoginUser)
       .expect(401)
       .expect('Content-Type', /application\/json/);
-    expect(loginResponse.body.error).toBe(validationMessages.error);
+    expect(loginResponse.body.error).toBe(validationMessages.invalidUsernameOrPassword);
   });
 });
 afterEach(async () => {

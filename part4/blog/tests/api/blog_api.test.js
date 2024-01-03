@@ -15,6 +15,11 @@ beforeEach(async () => {
   const userPromiseArray = usersHelper.initialUsers.map((user) => api.post(paths.users).send(user));
   const savedUsers = (await Promise.all(userPromiseArray)).map((response) => response.body);
 
+  const tokenPromiseArray = usersHelper.initialUsers.map((user) =>
+    api.post(paths.login).send(user)
+  );
+  const tokens = (await Promise.all(tokenPromiseArray)).map((response) => response.body);
+
   await Blog.deleteMany({});
   const blogObjects = blogsHelper.initialBlogs.map((blog) => {
     const username = blogsHelper.getUsernameOfABlog(blog.title);
@@ -22,7 +27,11 @@ beforeEach(async () => {
     blog.userId = user.id;
     return blog;
   });
-  const blogPromiseArray = blogObjects.map((blog) => api.post(paths.blogs).send(blog));
+  const blogPromiseArray = blogObjects.map((blog) => {
+    const username = blogsHelper.getUsernameOfABlog(blog.title);
+    const token = tokens.find((token) => token.username === username).token;
+    return api.post(paths.blogs).set('authorization', `Bearer ${token}`).send(blog);
+  });
   await Promise.all(blogPromiseArray);
 });
 describe('Blog API', () => {
@@ -54,10 +63,12 @@ describe('Blog API', () => {
   describe('save a blog:', () => {
     test('valid blog should be added correctly', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
+      const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
       blogToSave.userId = user.id;
       const savedBlogResponse = await api
         .post(paths.blogs)
+        .set('authorization', `Bearer ${token}`)
         .send(blogToSave)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -73,12 +84,14 @@ describe('Blog API', () => {
     });
     test('blog without likes should be saved and likes should be automatically set to 0', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
+      const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
       blogToSave.userId = user.id;
       delete blogToSave.likes;
       expect(blogToSave.likes).toBeUndefined();
       const savedBlogResponse = await api
         .post(paths.blogs)
+        .set('authorization', `Bearer ${token}`)
         .send(blogToSave)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -94,12 +107,14 @@ describe('Blog API', () => {
     });
     test('blog without title should not save', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
+      const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
       blogToSave.userId = user.id;
       delete blogToSave.title;
       expect(blogToSave.title).toBeUndefined();
       const response = await api
         .post(paths.blogs)
+        .set('authorization', `Bearer ${token}`)
         .send(blogToSave)
         .expect(400)
         .expect('Content-Type', /application\/json/);
@@ -112,12 +127,14 @@ describe('Blog API', () => {
     });
     test('blog without url should not save', async () => {
       const user = (await api.post(paths.users).send(usersHelper.unsavedUser)).body;
+      const token = (await api.post(paths.login).send(usersHelper.unsavedUser)).body.token;
       const blogToSave = _.clone(blogsHelper.unsavedBlog);
       blogToSave.userId = user.id;
       delete blogToSave.url;
       expect(blogToSave.url).toBeUndefined();
       const response = await api
         .post(paths.blogs)
+        .set('authorization', `Bearer ${token}`)
         .send(blogToSave)
         .expect(400)
         .expect('Content-Type', /application\/json/);
