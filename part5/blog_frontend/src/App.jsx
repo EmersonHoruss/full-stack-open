@@ -10,6 +10,9 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [notificationMessage, setNotificationMessage] = useState(null);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -20,6 +23,25 @@ const App = () => {
         password,
       });
       window.localStorage.setItem("user", JSON.stringify(user));
+      blogService.setToken(user.token);
+      setUser(user);
+      setUsername("");
+      setPassword("");
+    } catch (exception) {
+      setNotificationMessage("Wrong credentials");
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
+    }
+  };
+  const handleLoginAsAlbert = async () => {
+    try {
+      const user = await loginService.login({
+        username: "albert",
+        password: "albert123",
+      });
+      window.localStorage.setItem("user", JSON.stringify(user));
+      blogService.setToken(user.token);
       setUser(user);
       setUsername("");
       setPassword("");
@@ -34,15 +56,44 @@ const App = () => {
     setUser(null);
     localStorage.removeItem("user");
   };
+  const handleCreate = async () => {
+    try {
+      await blogService.create({
+        title,
+        author,
+        url,
+      });
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    } catch (exception) {
+      setNotificationMessage("Some problems happened, try again.");
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
+    }
+    try {
+      setBlogs(await blogService.getAll());
+    } catch (exception) {
+      setNotificationMessage("Some problems happened, reload the page.");
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
+    }
+  };
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("user");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      blogService.setToken(user.token);
     }
   }, []);
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => {
+      console.log(blogs);
+      setBlogs(blogs);
+    });
   }, []);
 
   if (user === null) {
@@ -70,6 +121,9 @@ const App = () => {
             />
           </div>
           <button type="submit">login</button>
+          <button type="button" onClick={handleLoginAsAlbert}>
+            login as albert
+          </button>
         </form>
       </div>
     );
@@ -83,6 +137,41 @@ const App = () => {
           logout
         </button>
       </p>
+      <div>
+        <h2>create new</h2>
+        <form>
+          <div>
+            title
+            <input
+              type="text"
+              value={title}
+              name="Title"
+              onChange={({ target }) => setTitle(target.value)}
+            />
+          </div>
+          <div>
+            author
+            <input
+              type="author"
+              value={author}
+              name="Author"
+              onChange={({ target }) => setAuthor(target.value)}
+            />
+          </div>
+          <div>
+            url
+            <input
+              type="url"
+              value={url}
+              name="Url"
+              onChange={({ target }) => setUrl(target.value)}
+            />
+          </div>
+          <button type="button" onClick={handleCreate}>
+            create
+          </button>
+        </form>
+      </div>
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
