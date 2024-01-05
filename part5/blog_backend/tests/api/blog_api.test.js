@@ -225,7 +225,7 @@ describe('Blog API', () => {
   });
   describe('update a blog:', () => {
     test('valid blog should be updated correctly', async () => {
-      const aBlog = await blogsHelper.aBlogInDb();
+      const aBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
       const { id } = aBlog;
       delete aBlog.id;
       aBlog.likes = 100;
@@ -238,9 +238,9 @@ describe('Blog API', () => {
       expect(likeBlogs).toHaveLength(blogsHelper.initialBlogs.length);
       expect(likeBlogs).toContain(response.body.likes);
     });
-    test('if title or url are missing should not update', async () => {
-      let aBlog = await blogsHelper.aBlogInDb();
-      const { id } = aBlog;
+    test('if blog is missing title so should not update', async () => {
+      let aBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
+      const { id, title } = aBlog;
       delete aBlog.id;
       aBlog.title = null;
       await api
@@ -248,10 +248,12 @@ describe('Blog API', () => {
         .send(aBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/);
-      const noUpdateBlog = await blogsHelper.aBlogInDb();
-      expect(noUpdateBlog.title).toBe(blogsHelper.mythBlog.title);
-
-      aBlog = await blogsHelper.aBlogInDb();
+      const noUpdateBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
+      expect(noUpdateBlog.title).toBe(title);
+    });
+    test('if url is missing title so should not update', async () => {
+      let aBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
+      const { id, url } = aBlog;
       delete aBlog.id;
       aBlog.url = null;
       await api
@@ -259,7 +261,8 @@ describe('Blog API', () => {
         .send(aBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/);
-      expect(noUpdateBlog.url).toBe(blogsHelper.mythBlog.url);
+      const noUpdateBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
+      expect(noUpdateBlog.url).toBe(url);
     });
   });
 });

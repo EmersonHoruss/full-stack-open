@@ -16,7 +16,7 @@ const Blog = ({ blog }) => {
   return (
     <div style={blogStyle}>
       <p>
-        {blog.title} wrote by {blog.author}
+        {blog.title} by {blog.author}
         <button onClick={() => setAreDetailsHidden(!areDetailsHidden)}>
           {areDetailsHidden ? "view" : "hide"}
         </button>
