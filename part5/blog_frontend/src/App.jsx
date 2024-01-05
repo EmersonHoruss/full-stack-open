@@ -3,6 +3,7 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./Notification";
+import Togglable from "./Tooglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -28,7 +29,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      console.log(exception)
+      console.log(exception);
       setNotificationMessage(`${exception.response.data.error}`);
       setTimeout(() => {
         setNotificationMessage(null);
@@ -145,38 +146,40 @@ const App = () => {
       </p>
       <div>
         <h2>create new</h2>
-        <form>
-          <div>
-            title
-            <input
-              type="text"
-              value={title}
-              name="Title"
-              onChange={({ target }) => setTitle(target.value)}
-            />
-          </div>
-          <div>
-            author
-            <input
-              type="author"
-              value={author}
-              name="Author"
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-          </div>
-          <div>
-            url
-            <input
-              type="url"
-              value={url}
-              name="Url"
-              onChange={({ target }) => setUrl(target.value)}
-            />
-          </div>
-          <button type="button" onClick={handleCreate}>
-            create
-          </button>
-        </form>
+        <Togglable buttonLabel="new note">
+          <form>
+            <div>
+              title
+              <input
+                type="text"
+                value={title}
+                name="Title"
+                onChange={({ target }) => setTitle(target.value)}
+              />
+            </div>
+            <div>
+              author
+              <input
+                type="author"
+                value={author}
+                name="Author"
+                onChange={({ target }) => setAuthor(target.value)}
+              />
+            </div>
+            <div>
+              url
+              <input
+                type="url"
+                value={url}
+                name="Url"
+                onChange={({ target }) => setUrl(target.value)}
+              />
+            </div>
+            <button type="button" onClick={handleCreate}>
+              create
+            </button>
+          </form>
+        </Togglable>
       </div>
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
