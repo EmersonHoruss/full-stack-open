@@ -27,7 +27,6 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      console.log(exception);
       setNotificationMessage(`${exception.response.data.error}`);
       setTimeout(() => {
         setNotificationMessage(null);
@@ -64,7 +63,6 @@ const App = () => {
         setNotificationMessage(null);
       }, 5000);
     } catch (exception) {
-      console.log(exception);
       setNotificationMessage("Some problems happened, try again.");
       setTimeout(() => {
         setNotificationMessage(null);
@@ -89,7 +87,6 @@ const App = () => {
   }, []);
   useEffect(() => {
     blogService.getAll().then((blogs) => {
-      console.log(blogs);
       setBlogs(blogs);
     });
   }, []);
