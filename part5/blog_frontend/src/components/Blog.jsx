@@ -16,7 +16,7 @@ const Blog = ({ blog }) => {
   return (
     <div style={blogStyle}>
       <p>
-        {blog.title}
+        {blog.title} wrote by {blog.author}
         <button onClick={() => setAreDetailsHidden(!areDetailsHidden)}>
           {areDetailsHidden ? "view" : "hide"}
         </button>
@@ -27,7 +27,7 @@ const Blog = ({ blog }) => {
           <p>
             likes {blog.likes} <button onClick={handleLike}>like</button>
           </p>
-          <p>{blog.author}</p>
+          <p>{blog.user.name}</p>
         </div>
       )}
     </div>
