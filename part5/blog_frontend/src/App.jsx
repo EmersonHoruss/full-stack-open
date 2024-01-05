@@ -28,7 +28,8 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      setNotificationMessage("Wrong credentials");
+      console.log(exception)
+      setNotificationMessage(`${exception.response.data.error}`);
       setTimeout(() => {
         setNotificationMessage(null);
       }, 5000);
@@ -66,6 +67,10 @@ const App = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
+      setNotificationMessage(`a new blog added "${title}" by ${author}`);
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
     } catch (exception) {
       setNotificationMessage("Some problems happened, try again.");
       setTimeout(() => {
@@ -131,6 +136,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={notificationMessage} />
       <p>
         {user.name} logged in{" "}
         <button type="button" onClick={handleLogout}>
