@@ -77,6 +77,24 @@ const App = () => {
       }, 5000);
     }
   };
+  const handleUpdate = async (blog) => {
+    try {
+      await blogService.update(blog);
+    } catch (exception) {
+      setNotificationMessage("Some problems happened, try again.");
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
+    }
+    try {
+      setBlogs(await blogService.getAll());
+    } catch (exception) {
+      setNotificationMessage("Some problems happened, reload the page.");
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, 5000);
+    }
+  };
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("user");
     if (loggedUserJSON) {
@@ -87,7 +105,7 @@ const App = () => {
   }, []);
   useEffect(() => {
     blogService.getAll().then((blogs) => {
-      console.log(blogs)
+      console.log(blogs);
       setBlogs(blogs);
     });
   }, []);
@@ -141,7 +159,7 @@ const App = () => {
         </Togglable>
       </div>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onUpdate={handleUpdate} />
       ))}
     </div>
   );

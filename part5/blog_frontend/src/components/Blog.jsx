@@ -8,10 +8,14 @@ const blogStyle = {
   borderWidth: 1,
   marginBottom: 5,
 };
-const Blog = ({ blog }) => {
+const Blog = ({ blog, onUpdate }) => {
   const [areDetailsHidden, setAreDetailsHidden] = useState(true);
   const handleLike = () => {
-    console.log(blog.likes);
+    const blogToUpdate = {
+      ...blog,
+      likes: blog.likes + 1,
+    };
+    onUpdate(blogToUpdate);
   };
   return (
     <div style={blogStyle}>

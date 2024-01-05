@@ -227,7 +227,6 @@ describe('Blog API', () => {
     test('valid blog should be updated correctly', async () => {
       const aBlog = await blogsHelper.aBlogInDb(blogsHelper.chavin.title);
       const { id } = aBlog;
-      delete aBlog.id;
       aBlog.likes = 100;
       const response = await api
         .put(`/api/blogs/${id}`)
