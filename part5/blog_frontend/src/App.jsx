@@ -68,8 +68,15 @@ const App = () => {
         setNotificationMessage(null);
       }, 5000);
     }
+    await getBlogs();
+  };
+  const getBlogs = async () => {
     try {
-      setBlogs(await blogService.getAll());
+      const blogs = await blogService.getAll();
+      const blogsSortedByNumberOfLikes = blogs.sort(
+        (a, b) => b.likes - a.likes
+      );
+      setBlogs(blogsSortedByNumberOfLikes);
     } catch (exception) {
       setNotificationMessage("Some problems happened, reload the page.");
       setTimeout(() => {
@@ -86,14 +93,7 @@ const App = () => {
         setNotificationMessage(null);
       }, 5000);
     }
-    try {
-      setBlogs(await blogService.getAll());
-    } catch (exception) {
-      setNotificationMessage("Some problems happened, reload the page.");
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
-    }
+    getBlogs();
   };
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("user");
@@ -104,10 +104,7 @@ const App = () => {
     }
   }, []);
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      console.log(blogs);
-      setBlogs(blogs);
-    });
+    getBlogs();
   }, []);
 
   if (user === null) {
