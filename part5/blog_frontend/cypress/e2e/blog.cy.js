@@ -4,11 +4,7 @@ import BlogHelper from "../../src/components/BlogHelper";
 describe("Blog App", function () {
   beforeEach(function () {
     cy.request("POST", `${Cypress.env("BACKEND")}/testing/reset`);
-    cy.request(
-      "POST",
-      `${Cypress.env("BACKEND")}/users/`,
-      GeneralHelper.user
-    );
+    cy.request("POST", `${Cypress.env("BACKEND")}/users/`, GeneralHelper.user);
     cy.visit("");
   });
   it("Login form is shown", function () {
@@ -16,7 +12,7 @@ describe("Blog App", function () {
     cy.contains("login");
   });
   describe("Login", function () {
-    it.only("succeeds with correct credentials", function () {
+    it("succeeds with correct credentials", function () {
       const { name } = GeneralHelper.user;
       cy.login(GeneralHelper.user);
       cy.contains(`${name} logged in`);
@@ -35,14 +31,10 @@ describe("Blog App", function () {
       cy.login(GeneralHelper.user);
     });
     it.only("A blog can be created", function () {
-      const { title, author, url } = BlogHelper.blog;
-      cy.contains("new note").click();
-      cy.get("#title").type(title);
-      cy.get("#author").type(author);
-      cy.get("#url").type(url);
-      cy.get("#create").click();
-      cy.contains(`a new blog added "${title}" by ${author}`);
+      const { title, author } = BlogHelper.blog;
+      cy.createBlog(BlogHelper.blog);
+      cy.contains(`${title} by ${author}`);
     });
-    it.only("A blog can be updated with likes", function () {});
+    it("User can like a blog", function () {});
   });
 });

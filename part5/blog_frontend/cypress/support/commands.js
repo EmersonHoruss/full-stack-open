@@ -32,3 +32,22 @@ Cypress.Commands.add("login", (user) => {
     }
   );
 });
+Cypress.Commands.add("createBlog", (blog) => {
+  cy.request({
+    url: `${Cypress.env("BACKEND")}/blogs`,
+    method: "POST",
+    body: blog,
+    headers: {
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")).token}`,
+    },
+  });
+  cy.visit("");
+});
+Cypress.Commands.add("login", (user) => {
+  cy.request("POST", `${Cypress.env("BACKEND")}/login`, user).then(
+    ({ body }) => {
+      localStorage.setItem("user", JSON.stringify(body));
+      cy.visit("");
+    }
+  );
+});
