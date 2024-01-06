@@ -7,14 +7,20 @@ const wronUser = {
   ...user,
   password: "wrongPassword",
 };
+const secondUser = {
+  username: "userTest2",
+  name: "nameTest2",
+  password: "passwordTest1232",
+};
 const userLS = {
   username: user.username,
   token: "tokenTest",
   name: user.name,
 };
-const GeneralHelper = {
-  userLS,
+const UserHelper = {
   user,
   wronUser,
+  secondUser,
+  userLS,
 };
-export default GeneralHelper;
+export default UserHelper;
