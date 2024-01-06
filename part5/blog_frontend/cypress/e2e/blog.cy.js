@@ -31,25 +31,25 @@ describe("Blog App", function () {
       cy.login(UserHelper.user);
     });
     it("A blog can be created", function () {
-      const { title, author } = BlogHelper.blog;
-      cy.createBlog(BlogHelper.blog);
+      const { title, author } = BlogHelper.blogOfFirstUser;
+      cy.createBlog(BlogHelper.blogOfFirstUser);
       cy.contains(`${title} by ${author}`);
     });
     it("User can like a blog", function () {
-      cy.createBlog(BlogHelper.blog);
+      cy.createBlog(BlogHelper.blogOfFirstUser);
       cy.contains("view").click();
       cy.contains("like").click();
-      cy.contains(`likes ${BlogHelper.blog.likes + 1}`);
+      cy.contains(`likes ${BlogHelper.blogOfFirstUser.likes + 1}`);
     });
     it("User can delete because he created", function () {
-      const { title, author } = BlogHelper.blog;
-      cy.createBlog(BlogHelper.blog);
+      const { title, author } = BlogHelper.blogOfFirstUser;
+      cy.createBlog(BlogHelper.blogOfFirstUser);
       cy.contains("view").click();
       cy.contains("remove").click();
       cy.get("html").should("not.contain", `${title} by ${author}`);
     });
-    it.only("User cannot delete because he did not create, button remove does not appear", function () {
-      cy.createBlog(BlogHelper.blog);
+    it("User cannot delete because he did not create, button remove does not appear", function () {
+      cy.createBlog(BlogHelper.blogOfFirstUser);
       cy.contains("logout").click();
       cy.request(
         "POST",
@@ -57,11 +57,28 @@ describe("Blog App", function () {
         UserHelper.secondUser
       );
       cy.login(UserHelper.secondUser);
-      cy.contains(`${BlogHelper.blog.title} by ${BlogHelper.blog.author}`)
+      cy.contains(
+        `${BlogHelper.blogOfFirstUser.title} by ${BlogHelper.blogOfFirstUser.author}`
+      )
         .contains("view")
         .click()
         .contains("remove")
         .should("not.exist");
+    });
+    it.only("Blogs should be ordered by higher amount of likes", function () {
+      const { blogFirst, blogSecond, blogThird, blogFourth } = BlogHelper;
+      cy.createBlog(blogFourth);
+      cy.createBlog(blogFirst);
+      cy.createBlog(blogSecond);
+      cy.createBlog(blogThird);
+      cy.get("#blogs")
+        .children()
+        .eq(0)
+        .contains(`${blogFourth.title} by ${blogFourth.author}`);
+      cy.get("#blogs")
+        .children()
+        .eq(3)
+        .contains(`${blogFirst.title} by ${blogFirst.author}`);
     });
   });
 });
