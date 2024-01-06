@@ -2,34 +2,35 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import Blog from "./Blog";
 import "jest-localstorage-mock";
+import GeneralHelper from "../GeneralHelper";
+import BlogHelper from "./BlogHelper";
+import userEvent from "@testing-library/user-event";
 
 describe("Blog Test", () => {
   beforeEach(() => {
     localStorage.clear();
-    const user = {
-      username: "test username",
-      token: "test token",
-      name: "name",
-    };
-    localStorage.setItem("user", JSON.stringify(user));
-  });
-
-  afterEach(() => {
-    localStorage.clear();
-  });
-  test("should display blog's title and author by default but other attribute should be hidden", () => {
-    const blog = {
-      title: "test title",
-      author: "test author",
-      url: "http://test-blog",
-      user: localStorage.getItem("user"),
-    };
+    localStorage.setItem("user", JSON.stringify(GeneralHelper.user));
+    const { blog } = BlogHelper;
     const handleUpdate = jest.fn();
     const handleRemove = jest.fn();
     render(
       <Blog blog={blog} onUpdate={handleUpdate} onRemove={handleRemove} />
     );
+  });
+  afterEach(() => {
+    localStorage.clear();
+  });
+  test("should display blog's title and author by default but other attribute should be hidden", () => {
+    const { blog } = BlogHelper;
     const element = screen.getByText(`${blog.title} by ${blog.author}`);
     expect(element).toBeDefined();
+  });
+  test("when clicked on view button blog's url and number of likes are shown", async () => {
+    const { blog } = BlogHelper;
+    const user = userEvent.setup();
+    const button = screen.getByText("view");
+    await user.click(button);
+    screen.getByText(`${blog.url}`);
+    screen.getByText(`likes ${blog.likes}`);
   });
 });
