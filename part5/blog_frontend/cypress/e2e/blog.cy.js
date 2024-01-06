@@ -48,7 +48,7 @@ describe("Blog App", function () {
       cy.contains("remove").click();
       cy.get("html").should("not.contain", `${title} by ${author}`);
     });
-    it.only("User cannot delete because he did not create", function () {
+    it.only("User cannot delete because he did not create, button remove does not appear", function () {
       cy.createBlog(BlogHelper.blog);
       cy.contains("logout").click();
       cy.request(
