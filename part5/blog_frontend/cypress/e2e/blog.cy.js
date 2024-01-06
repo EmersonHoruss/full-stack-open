@@ -30,11 +30,16 @@ describe("Blog App", function () {
     beforeEach(function () {
       cy.login(GeneralHelper.user);
     });
-    it.only("A blog can be created", function () {
+    it("A blog can be created", function () {
       const { title, author } = BlogHelper.blog;
       cy.createBlog(BlogHelper.blog);
       cy.contains(`${title} by ${author}`);
     });
-    it("User can like a blog", function () {});
+    it.only("User can like a blog", function () {
+      cy.createBlog(BlogHelper.blog);
+      cy.contains("view").click();
+      cy.contains("like").click();
+      cy.contains(`likes ${BlogHelper.blog.likes + 1}`);
+    });
   });
 });
