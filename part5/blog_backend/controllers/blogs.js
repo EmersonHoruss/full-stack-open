@@ -31,6 +31,7 @@ router.post('/', async (request, response) => {
 router.delete('/:id', async (request, response) => {
   const { id } = request.params;
   const blog = await Blog.findById(id);
+
   if (!blog) {
     response.status(204).end();
   }

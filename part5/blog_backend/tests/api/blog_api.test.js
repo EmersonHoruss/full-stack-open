@@ -170,7 +170,7 @@ describe('Blog API', () => {
       const blogsAtStart = await blogsHelper.blogsInDb();
       const { id, title, user } = blogsAtStart[0];
       const token = await loginHelper.validToken(user.username);
-      await api.delete(`/api/blogs/${id}`).set('authorization', `Bearer ${token}`).expect(204);
+      await api.delete(`/api/blogs/${id}`).set('Authorization', `Bearer ${token}`).expect(204);
       const blogsAtEnd = await blogsHelper.blogsInDb();
       expect(blogsAtEnd).toHaveLength(blogsHelper.initialBlogs.length - 1);
       const titleBlogs = blogsAtEnd.map((blog) => blog.title);

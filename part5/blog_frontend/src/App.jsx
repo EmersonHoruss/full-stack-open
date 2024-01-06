@@ -95,6 +95,21 @@ const App = () => {
     }
     getBlogs();
   };
+  const handleRemove = async (blog) => {
+    const result = confirm(`Remove blog "${blog.title}" by ${blog.author}`);
+    if (result) {
+      try {
+        await blogService.remove(blog.id);
+      } catch (exception) {
+        console.log(exception);
+        setNotificationMessage("Some problems happened, try again.");
+        setTimeout(() => {
+          setNotificationMessage(null);
+        }, 5000);
+      }
+      await getBlogs();
+    }
+  };
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("user");
     if (loggedUserJSON) {
@@ -156,7 +171,12 @@ const App = () => {
         </Togglable>
       </div>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} onUpdate={handleUpdate} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          onUpdate={handleUpdate}
+          onRemove={handleRemove}
+        />
       ))}
     </div>
   );

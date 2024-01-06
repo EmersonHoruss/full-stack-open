@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
 const blogStyle = {
@@ -8,14 +8,23 @@ const blogStyle = {
   borderWidth: 1,
   marginBottom: 5,
 };
-const Blog = ({ blog, onUpdate }) => {
+const Blog = ({ blog, onUpdate, onRemove }) => {
   const [areDetailsHidden, setAreDetailsHidden] = useState(true);
+  const [isAvaibleToDelete, setIsAvailableToDelete] = useState(false);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const isAvaibleToDelete = blog.user.username === user.username;
+    setIsAvailableToDelete(isAvaibleToDelete);
+  }, []);
   const handleLike = () => {
     const blogToUpdate = {
       ...blog,
       likes: blog.likes + 1,
     };
     onUpdate(blogToUpdate);
+  };
+  const handleRemove = () => {
+    onRemove(blog);
   };
   return (
     <div style={blogStyle}>
@@ -32,6 +41,7 @@ const Blog = ({ blog, onUpdate }) => {
             likes {blog.likes} <button onClick={handleLike}>like</button>
           </p>
           <p>{blog.user.name}</p>
+          {isAvaibleToDelete && <button onClick={handleRemove}>remove</button>}
         </div>
       )}
     </div>
