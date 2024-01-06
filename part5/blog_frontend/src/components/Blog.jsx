@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const blogStyle = {
   paddingTop: 10,
@@ -15,7 +16,7 @@ const Blog = ({ blog, onUpdate, onRemove }) => {
     const user = JSON.parse(localStorage.getItem("user"));
     const isAvaibleToDelete = blog.user.username === user.username;
     setIsAvailableToDelete(isAvaibleToDelete);
-  }, []);
+  }, [blog.user.username]);
   const handleLike = () => {
     const blogToUpdate = {
       ...blog,
@@ -47,5 +48,9 @@ const Blog = ({ blog, onUpdate, onRemove }) => {
     </div>
   );
 };
-
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+};
 export default Blog;
