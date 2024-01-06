@@ -1,7 +1,20 @@
 const user = {
   username: "userTest",
-  token: "tokenTest",
   name: "nameTest",
+  password: "passwordTest123",
 };
-const GeneralHelper = { user };
+const wronUser = {
+  ...user,
+  password: "wrongPassword",
+};
+const userLS = {
+  username: user.username,
+  token: "tokenTest",
+  name: user.name,
+};
+const GeneralHelper = {
+  userLS,
+  user,
+  wronUser,
+};
 export default GeneralHelper;
