@@ -31,4 +31,13 @@ describe("Blog Test", () => {
     screen.getByText(`${blog.url}`);
     screen.getByText(`likes ${blog.likes}`);
   });
+  test("when click on like button twice the event handle should be called the same times", async () => {
+    const user = userEvent.setup();
+    const viewButton = screen.getByText("view");
+    await user.click(viewButton);
+    const likeButton = screen.getByText("like");
+    await user.click(likeButton);
+    await user.click(likeButton);
+    expect(handleUpdate.mock.calls).toHaveLength(2)
+  });
 });
