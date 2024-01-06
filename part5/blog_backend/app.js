@@ -29,6 +29,10 @@ app.use(middleware.userExtractor);
 app.use(paths.blogs, blogsRouter);
 app.use(paths.users, usersRouter);
 app.use(paths.login, loginRouter);
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use(paths.testing, testingRouter)
+}
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 module.exports = app;
