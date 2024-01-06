@@ -12,11 +12,9 @@ describe("Blog App", function () {
     cy.contains("login");
   });
   describe("Login", function () {
-    it("succeeds with correct credentials", function () {
-      const { username, password, name } = GeneralHelper.user;
-      cy.get("#username").type(username);
-      cy.get("#password").type(password);
-      cy.get("#login").click();
+    it.only("succeeds with correct credentials", function () {
+      const { name } = GeneralHelper.user;
+      cy.login(GeneralHelper.user);
       cy.contains(`${name} logged in`);
     });
     it("fails with wrong credentials", function () {
@@ -29,12 +27,9 @@ describe("Blog App", function () {
     });
   });
   describe("When logged in", function () {
-    beforeEach(function() {
-      const { username, password } = GeneralHelper.user;
-      cy.get("#username").type(username);
-      cy.get("#password").type(password);
-      cy.get("#login").click();
-    })
+    beforeEach(function () {
+      cy.login(GeneralHelper.user);
+    });
     it.only("A blog can be created", function () {
       const { title, author, url } = BlogHelper.blog;
       cy.contains("new note").click();
@@ -42,7 +37,8 @@ describe("Blog App", function () {
       cy.get("#author").type(author);
       cy.get("#url").type(url);
       cy.get("#create").click();
-      cy.contains(`a new blog added "${title}" by ${author}`)
+      cy.contains(`a new blog added "${title}" by ${author}`);
     });
+    it.only("A blog can be updated with likes", function () {});
   });
 });
